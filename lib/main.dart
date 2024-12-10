@@ -15,22 +15,19 @@ final GoRouter mainRouter = GoRouter(
   ],
 );
 
-/// ボトムシート専用 GoRouter を生成する関数
-GoRouter createBottomSheetRouter() {
-  return GoRouter(
-    initialLocation: '/home',
-    routes: [
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => BottomSheetHomePage(),
-      ),
-      GoRoute(
-        path: '/second',
-        builder: (context, state) => BottomSheetSecondPage(),
-      ),
-    ],
-  );
-}
+final GoRouter bottomSheetRouter = GoRouter(
+  initialLocation: '/home',
+  routes: [
+    GoRoute(
+      path: '/home',
+      builder: (context, state) => BottomSheetHomePage(),
+    ),
+    GoRoute(
+      path: '/second',
+      builder: (context, state) => BottomSheetSecondPage(),
+    ),
+  ],
+);
 
 class MyApp extends StatelessWidget {
   @override
@@ -43,17 +40,19 @@ class MyApp extends StatelessWidget {
 
 class HomePage extends StatelessWidget {
   void _showBottomSheet(BuildContext context) {
+    // ボトムシートを開く前にルートをリセット
+    bottomSheetRouter.go('/home');
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) {
-        // 新しい GoRouter インスタンスを使用
-        return SizedBox(
-          height: MediaQuery.of(context).size.height * 0.8,
+        return FractionallySizedBox(
+          heightFactor: 0.9,
           child: ClipRRect(
             borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
             child: MaterialApp.router(
-              routerConfig: createBottomSheetRouter(), // 新しい GoRouter を生成
+              routerConfig: bottomSheetRouter,
               debugShowCheckedModeBanner: false,
             ),
           ),
@@ -88,8 +87,7 @@ class BottomSheetHomePage extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.close),
             onPressed: () {
-              // ボトムシート全体を閉じる
-              Navigator.of(context, rootNavigator: true).pop();
+              Navigator.of(context, rootNavigator: true).pop(); // ボトムシート全体を閉じる
             },
           ),
         ],
