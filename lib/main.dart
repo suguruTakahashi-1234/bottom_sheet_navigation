@@ -5,6 +5,33 @@ void main() {
   runApp(MyApp());
 }
 
+/// メインアプリ用 GoRouter
+final GoRouter mainRouter = GoRouter(
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => HomePage(),
+    ),
+  ],
+);
+
+/// ボトムシート専用 GoRouter を生成する関数
+GoRouter createBottomSheetRouter() {
+  return GoRouter(
+    initialLocation: '/home',
+    routes: [
+      GoRoute(
+        path: '/home',
+        builder: (context, state) => BottomSheetHomePage(),
+      ),
+      GoRoute(
+        path: '/second',
+        builder: (context, state) => BottomSheetSecondPage(),
+      ),
+    ],
+  );
+}
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -12,46 +39,22 @@ class MyApp extends StatelessWidget {
       routerConfig: mainRouter, // メインアプリ用 GoRouter
     );
   }
-
-  /// メインアプリ用 GoRouter
-  final GoRouter mainRouter = GoRouter(
-    routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => HomePage(),
-      ),
-    ],
-  );
 }
 
-/// メインアプリのホーム画面
 class HomePage extends StatelessWidget {
   void _showBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) {
-        // 新しい GoRouter インスタンスを作成
-        final GoRouter bottomSheetRouter = GoRouter(
-          initialLocation: '/home',
-          routes: [
-            GoRoute(
-              path: '/home',
-              builder: (context, state) => BottomSheetHomePage(),
-            ),
-            GoRoute(
-              path: '/second',
-              builder: (context, state) => BottomSheetSecondPage(),
-            ),
-          ],
-        );
-
+        // 新しい GoRouter インスタンスを使用
         return SizedBox(
           height: MediaQuery.of(context).size.height * 0.8,
           child: ClipRRect(
             borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
             child: MaterialApp.router(
-              routerConfig: bottomSheetRouter, // 新しい GoRouter を使用
+              routerConfig: createBottomSheetRouter(), // 新しい GoRouter を生成
+              debugShowCheckedModeBanner: false,
             ),
           ),
         );
@@ -103,20 +106,18 @@ class BottomSheetHomePage extends StatelessWidget {
   }
 }
 
-/// ボトムシートの2番目のページ
 class BottomSheetSecondPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
         title: Text('Second Page'),
         actions: [
           IconButton(
             icon: Icon(Icons.close),
             onPressed: () {
-              // ボトムシート全体を閉じる
-              Navigator.of(context, rootNavigator: true).pop();
+              Navigator.of(context, rootNavigator: true).pop(); // ボトムシート全体を閉じる
             },
           ),
         ],
